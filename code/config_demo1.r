@@ -1,11 +1,13 @@
 ###############################################################################
 # Configuration file for demo 1 showing propagation of error for a model
-# of error on kelp area estimtaes.
+# of error on kelp area estimates.
 #
 # September 2026
 ###############################################################################
 
+
 A <- 10    # true kelp area value in hectares
+
 
 # parameters for classification error distribution modeled as a normal distr.
 # Not sure how likely normal fits here as a mash-up of the occurrences of missed
