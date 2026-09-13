@@ -1,52 +1,78 @@
 ###############################################################################
-# Demo 2 showing how the variance of the sum of two
-# random variables responds to covariance.  This is demonstrated with simulated
-# data.
+# Demo 2 showing how the variance of the sum of two random variables
+# responds to covariance between the two random variables. This is 
+# demonstrated with simulated data.
 #
-# Variables are named to follow:  y = x1 + x2
+# Variables are named to follow  y = x1 + x2 where all are random variables.
+# Variable z is a precursor random variable used to create x2.
 #
 # September 2026
 ###############################################################################
 
+library(dplyr)
 library(stringr)
 
 
 ###############################################################################
 # set parameters
 ###############################################################################
-N <- 10000    # size of x1 and x2 simulated datasets
+N <- 10000    # size of x1 and x2 simulated vectors 
 
-# parameters for normal distributions: x1 and the 'parent' of versions of x2 
+# parameters for normal distributions for freq. distributions of x1 and x2
 x1_mean <- 10 
 x1_stdev <- 2
 
-p2_mean <- 12
-p2_stdev <- 3
+x2_mean <- 12
+x2_stdev <- 3
 
-# correlation values to create range of covariance between random variables 
-corr_design_vals <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+# correlation values to create range of covariance between x1 and x2 
+corr_target_vals <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
 
 
 ###############################################################################
-#  create data frame with values of random variables x1 and multiple sets of
-#  x2 with different levels of covariance relative to x1
+#  create data frame with N rows and n columns with structure:
+#    col 1: values of random variable x1 
+#    col 2: random variates x2 with corr_vals[1] correlation with x2
+#    col 2: random variates x2 with corr_vals[2] correlation with x2
+#    col 2: random variates x2 with corr_vals[3] correlation with x2
+#    .....
+#    col n: random variates x2 with corr_vals[n] correlation with x2
 ###############################################################################
 
-# generate x1 random variates as first column of data frame 
-z1 <- rnorm(N)   # vector of standard normal random variates
-data <- data.frame(x1 = x1_mean + z1*x1_stdev)
+# first make data frame of same dimensions [N, n] with columns of independent
+# standard normal random variates. Col 1 is std normal version of x1.
+# Cols 2:n are all instances of z, which is also standard normal.
+nrows <- N
+ncols <- length(corr_target_vals) + 1
+data1 <- as.data.frame(matrix(rnorm(nrows*ncols), nrow=nrows, ncol=ncols))
 
-# create multiple series of x2 vectors with different covariance with x1
-for (icorr in corr_design_vals) {
- x2_parent <- p2_mean + rnorm(N)*p2_stdev
- x2 <- icorr * data$x1 + sqrt(1 - icorr^2) * x2_parent 
+# Transform the z columns to standard normal versions of x2 with specified
+# correlation with x1
+data2 <- data1
+for (icol in seq(2,ncols)) {
+ target_corr <- corr_target_vals[icol - 1]
+ data2[,icol] <- data2[,1]*target_corr + sqrt(1 - target_corr^2) * data2[,icol]
+}
+
+# Scale col 1 using x1 parameters, cols 2:n using x2 parameters
+data3 <- data2 
+data3[,1] <- x1_mean + data2[,1]*x1_stdev
+for (icol in seq(2:ncols)) {
+  data3[,icol] <- x2_mean + data2[,icol] * x2_stdev
+}
+
+# create meaningful column names
+df_names <- character(ncols)
+df_names[1] <- "x1"
+for (icol in seq(2,ncols)) {
+ icorr <- corr_target_vals[icol - 1]
  corr_str <- sprintf("%.1f", icorr)
  suffix <- str_remove(corr_str, "\\.")
  x2name <- str_c("x2", suffix, sep="_")
- data[[x2name]] <- x2
+ df_names[icol] <- x2name 
 }
-  
+names(data3) <- df_names  
 
 
 ###############################################################################
@@ -56,19 +82,33 @@ corr_vals <- cor(data[,1], data[,2:7], use = "pairwise.complete.obs")
 
 
 
-
-
 ###############################################################################
-# calc x1+x2 sums, population variances, covariances, correlations
+# calc x1+x2 sums, population variances, covariances
+# covariance(x,y) = correlation(x,y) / (stdev(x) * stdev(y))
 ###############################################################################
-
-
+for (icol in seq(2,ncols)) {
+  colname <- str_c("sum_",names(data3)[icol])
+  data3[[colname]] <- data3[,1] + data3[,icol]
+}
+col_vars <- sapply(data3, var)
+cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 
 
 
 ###############################################################################
 #  graph panels - freq. histograms of x1, x2, x1+x2 
 ###############################################################################
+
+
+
+
+# loop through correlation levels
+# create tidy data
+# make 3 graph panels
+
+
+
+
 
 
 
