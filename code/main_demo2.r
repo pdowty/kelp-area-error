@@ -114,10 +114,14 @@ data_tidy <- data3 |>
 
 # loop through correlation levels
 for (icorr in corr_target_vals) {
-   
+  # filter for records with icorr correlation or 9999 which are x1 records
+  data_filt <- data_tidy |> filter(target_correlation == icorr |
+                                   target_correlation == 9999.0)
+  
+  # make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
   
   
-  # make 3 graph panels
+  # make separte set of graphs with centering (0 x value) on means
   
   
 }
