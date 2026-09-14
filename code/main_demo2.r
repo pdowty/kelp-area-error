@@ -9,6 +9,7 @@
 # September 2026
 ###############################################################################
 
+library(tidyr)
 library(dplyr)
 library(stringr)
 
@@ -78,7 +79,7 @@ names(data3) <- df_names
 ###############################################################################
 #  get x1-x2 correlations
 ###############################################################################
-corr_vals <- cor(data[,1], data[,2:7], use = "pairwise.complete.obs")
+corr_vals <- cor(data3[,1], data3[,2:7], use = "pairwise.complete.obs")
 
 
 
@@ -98,13 +99,29 @@ cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 ###############################################################################
 #  graph panels - freq. histograms of x1, x2, x1+x2 
 ###############################################################################
-
-
-
+# make tidy
+data_tidy <- data3 |>
+  pivot_longer(cols=everything(), cols_vary="slowest", names_to="variable",
+               values_to="value") |>
+  mutate(target_correlation = ifelse(str_detect(variable, "_"),
+                                     as.numeric(str_extract(variable,"[^_]+$"))/10,
+                                     9999),
+         data_category = case_when(
+           str_detect(variable,"x1") ~ "x1",
+           str_detect(variable,"sum") ~ "sum",
+           str_detect(variable,"x2") ~ "x2"
+         ))
 
 # loop through correlation levels
-# create tidy data
-# make 3 graph panels
+for (icorr in corr_target_vals) {
+   
+  
+  
+  # make 3 graph panels
+  
+  
+}
+
 
 
 
