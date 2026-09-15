@@ -11,6 +11,7 @@
 
 library(tidyr)
 library(dplyr)
+library(ggplot2)
 library(stringr)
 
 
@@ -97,7 +98,7 @@ cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 
 
 ###############################################################################
-#  graph panels - freq. histograms of x1, x2, x1+x2 
+#  graph panels - x1-x2 xy scatter plot, freq. histograms of x1, x2, x1+x2 
 ###############################################################################
 # make tidy
 data_tidy <- data3 |>
@@ -119,7 +120,12 @@ for (icorr in corr_target_vals) {
                                    target_correlation == 9999.0)
   
   # make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
-  
+  p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category)) +
+    geom_histogram() +
+    facet_wrap(vars(data_category), ncol=1) +
+    theme_bw()
+  filename <- str_c("output_graphs/demo2",sprintf("%f", icorr),".png")
+  ggsave(file=filename)
   
   # make separte set of graphs with centering (0 x value) on means
   
