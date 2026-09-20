@@ -33,18 +33,20 @@ corr_target_vals <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
 
 ###############################################################################
-#  create data frame with N rows and n columns with structure:
+#  create data frame with N rows and n columns (n=length(corr_target_vals) +1)
+#  with structure:
 #    col 1: values of random variable x1 
 #    col 2: random variates x2 with corr_vals[1] correlation with x2
-#    col 2: random variates x2 with corr_vals[2] correlation with x2
-#    col 2: random variates x2 with corr_vals[3] correlation with x2
+#    col 3: random variates x2 with corr_vals[2] correlation with x2
+#    col 4: random variates x2 with corr_vals[3] correlation with x2
 #    .....
 #    col n: random variates x2 with corr_vals[n] correlation with x2
 ###############################################################################
 
 # first make data frame of same dimensions [N, n] with columns of independent
 # standard normal random variates. Col 1 is std normal version of x1.
-# Cols 2:n are all instances of z, which is also standard normal.
+# Cols 2:n are all instances of z, the precursor to x2, which is also 
+# standard normal.
 nrows <- N
 ncols <- length(corr_target_vals) + 1
 data1 <- as.data.frame(matrix(rnorm(nrows*ncols), nrow=nrows, ncol=ncols))
@@ -123,9 +125,17 @@ for (icorr in corr_target_vals) {
   p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category)) +
     geom_histogram() +
     facet_wrap(vars(data_category), ncol=1) +
-    theme_bw()
-  filename <- str_c("output_graphs/demo2",sprintf("%f", icorr),".png")
-  ggsave(file=filename)
+    theme_bw() +
+    theme(
+      legend.position = "none",
+      axis.text = element_text(size=6),
+      axis.title = element_text(size=8),
+      strip.text = element_blank()
+    ) +
+    scale_x_continuous(limits=c(0,40))
+  
+  filename <- str_c("output_graphs/demo2_",sprintf("%.1f", icorr),".png")
+  ggsave(file=filename, width=2.5, height=2, units="in")
   
   # make separte set of graphs with centering (0 x value) on means
   
