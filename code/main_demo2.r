@@ -62,7 +62,7 @@ for (icol in seq(2,ncols)) {
 # Scale col 1 using x1 parameters, cols 2:n using x2 parameters
 data3 <- data2 
 data3[,1] <- x1_mean + data2[,1]*x1_stdev
-for (icol in seq(2:ncols)) {
+for (icol in seq(2,ncols)) {
   data3[,icol] <- x2_mean + data2[,icol] * x2_stdev
 }
 
@@ -128,15 +128,15 @@ for (icorr in corr_target_vals) {
   label_var_data <- data.frame(
     data_category_fct = factor(c("sum","x1","x2"), levels = c("sum","x1","x2")),
     x = 40,
-    y = 1500,
+    y = 730,
     label = c("X1+X2","X1","X2")
   )
   
   p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category_fct)) +
-    geom_histogram() +
+    geom_histogram(bins=100, color="white", linewidth=0.2) +
     facet_wrap(vars(data_category_fct), ncol=1) +
     geom_text(data=label_var_data, mapping=aes(x=x, y=y, label=label),
-              hjust=1, vjust=1, inherit.aes=FALSE, size=10, size.unit="pt") +
+              hjust=1, vjust=1, inherit.aes=FALSE, size=8, size.unit="pt") +
     theme_bw() +
     theme(
       legend.position = "none",
@@ -144,7 +144,8 @@ for (icorr in corr_target_vals) {
       axis.title = element_text(size=8),
       strip.text = element_blank()
     ) +
-    scale_x_continuous(limits=c(0,40))
+    scale_x_continuous(limits=c(0,40)) +
+    scale_y_continuous(limits=c(0,900))
   
   filename <- str_c("output_graphs/demo2_",sprintf("%.1f", icorr),".png")
   ggsave(file=filename, width=2.5, height=2, units="in")
