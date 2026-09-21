@@ -113,7 +113,10 @@ data_tidy <- data3 |>
            str_detect(variable,"x1") ~ "x1",
            str_detect(variable,"sum") ~ "sum",
            str_detect(variable,"x2") ~ "x2"
-         ))
+         ),
+         data_category_fct = factor(data_category,
+                                    levels = c("sum","x1","x2"))
+         )
 
 # loop through correlation levels
 for (icorr in corr_target_vals) {
@@ -122,9 +125,18 @@ for (icorr in corr_target_vals) {
                                    target_correlation == 9999.0)
   
   # make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
-  p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category)) +
+  label_var_data <- data.frame(
+    data_category_fct = factor(c("sum","x1","x2"), levels = c("sum","x1","x2")),
+    x = 40,
+    y = 1500,
+    label = c("X1+X2","X1","X2")
+  )
+  
+  p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category_fct)) +
     geom_histogram() +
-    facet_wrap(vars(data_category), ncol=1) +
+    facet_wrap(vars(data_category_fct), ncol=1) +
+    geom_text(data=label_var_data, mapping=aes(x=x, y=y, label=label),
+              hjust=1, vjust=1, inherit.aes=FALSE, size=10, size.unit="pt") +
     theme_bw() +
     theme(
       legend.position = "none",
