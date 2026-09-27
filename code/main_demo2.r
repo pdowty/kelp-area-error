@@ -150,8 +150,16 @@ for (icorr in corr_target_vals) {
   filename <- str_c("output_graphs/demo2_",sprintf("%.1f", icorr),".png")
   ggsave(file=filename, width=2.5, height=2, units="in")
   
-  # make separte set of graphs with centering (0 x value) on means
-  
+  # make x1-x2 scatter plot
+  data_filt_wide <- data_filt %>%
+     filter(data_category_fct != "sum") %>%
+     pivot_wider(id_cols=data_category_fct, names_from=data_category_fct, 
+                 values_from=value)
+  pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
+    geom_point() +
+    theme_bw()
+  filename2 <- str_c("output_graphs/demo2_scatter_",sprintf("%.1f", icorr),".png")
+  ggsave(file=filename, width=1, height=1, units="in")
   
 }
 
