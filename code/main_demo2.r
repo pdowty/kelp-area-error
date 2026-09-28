@@ -153,8 +153,8 @@ for (icorr in corr_target_vals) {
   # make x1-x2 scatter plot
   data_filt_wide <- data_filt %>%
      filter(data_category_fct != "sum") %>%
-     pivot_wider(id_cols=data_category_fct, names_from=data_category_fct, 
-                 values_from=value)
+     select(-target_correlation, -data_category) %>%
+     pivot_wider(names_from=data_category_fct, values_from=value)
   pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
     geom_point() +
     theme_bw()
