@@ -94,7 +94,12 @@ for (icol in seq(2,ncols)) {
   colname <- str_c("sum_",names(data3)[icol])
   data3[[colname]] <- data3[,1] + data3[,icol]
 }
-col_vars <- sapply(data3, var)
+var_diff_df <- data.frame(col_vars <- sapply(data3, var))
+var_diff_df <- var_diff_df %>%
+  mutate(var_diff_PC = (col_vars - col_vars[8])/col_vars[8],
+         col_stdev = sqrt(col_vars),
+         sd_diff_PC = (col_stdev - col_stdev[8])/col_stdev[9])
+
 cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 
 
