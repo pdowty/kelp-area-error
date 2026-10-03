@@ -159,7 +159,7 @@ for (icorr in corr_target_vals) {
      ungroup() %>%
      pivot_wider(id_cols=obsID, names_from=data_category_fct, values_from=value)
   pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
-    geom_point(size=0.5) +
+    geom_point(size=0.5, alpha=0.2, stroke=0, fill="gray30") +
     theme_bw() +
     theme(
       axis.text = element_text(size=6),
