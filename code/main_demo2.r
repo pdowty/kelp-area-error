@@ -153,13 +153,21 @@ for (icorr in corr_target_vals) {
   # make x1-x2 scatter plot
   data_filt_wide <- data_filt %>%
      filter(data_category_fct != "sum") %>%
-     select(-target_correlation, -data_category) %>%
-     pivot_wider(names_from=data_category_fct, values_from=value)
+     select(-target_correlation, -data_category, -variable) %>%
+     group_by(data_category_fct) %>%
+     mutate(obsID = row_number()) %>%
+     ungroup() %>%
+     pivot_wider(id_cols=obsID, names_from=data_category_fct, values_from=value)
   pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
-    geom_point() +
-    theme_bw()
+    geom_point(size=0.5) +
+    theme_bw() +
+    theme(
+      axis.text = element_text(size=6),
+      axis.title = element_text(size=8),
+      strip.text = element_blank()
+    )
   filename2 <- str_c("output_graphs/demo2_scatter_",sprintf("%.1f", icorr),".png")
-  ggsave(file=filename, width=1, height=1, units="in")
+  ggsave(file=filename2, width=1.5, height=1.5, units="in")
   
 }
 
