@@ -1,6 +1,12 @@
 ###############################################################################
 #  Demo 1 in Appendix B3
 #
+#  This function takes a value of k and a data frame with variable A.
+#  A=kelp area values; k = constant to relate area to stdev of source errors:
+#     error_std_dev = k * A
+#
+#  This function returns a table with correlation results.
+#
 #  October 2026
 ###############################################################################
 
@@ -9,11 +15,11 @@ library(ggplot2)
 library(rstatix)
 
 
-# proportional constant relating A to kelp area
+# proportional constant relating A to standard deviation of source errors 
 k <- 0.10
 
-#  generate A vector
-df <- data.frame(A = seq(0, 20, by=0.001))
+#  generate A vector on scale meaningful for hectare units
+df <- data.frame(A = seq(0, 20, by=1.0))
 nrows <- dim(df)[1]
 
 # generate 4 error vectors as function of A
