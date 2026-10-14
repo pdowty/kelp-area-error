@@ -9,10 +9,14 @@ library(ggplot2)
 library(rstatix)
 
 
-# generate 4 error vectors as function of A
-nrows <- 20    #  20 years of monitoring data
+##################### set parameters ####################
 
-nreps <- 2000  # number of simulations to run
+nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring data
+
+# number of iterations to run, with 4 simulations nested within each iteration
+nreps <- 2000 
+
+# set bins of correlation for graphing
 bins <- seq(-0.8,0.8, by=0.05)
 bin_upper_lim <- bins[-1]
 
@@ -22,15 +26,19 @@ table_list_sig <- list()
 
 set.seed(42)   # for reproducibility
 
-# run through simulations and count cases with r bins with significance flag
-sig_counter <- 1
+target_alpha <- 0.05
+
+
+
+################ iterations of simulating data and calc correlation ###########
+
+sig_counter <- 1  # index for list of iterations with sig. correlation
 for (i in seq(1,nreps)) {
 
   # write occasional update to console
   if (i %% 50 == 0) {
     message(sprintf("Working on iteration %d",i))
   }
-  
   
   df <- data.frame( 
       e1 = rnorm(nrows),
@@ -52,7 +60,7 @@ for (i in seq(1,nreps)) {
   table_list[[i]] <- table(binned_data)
    
   # filter for statistically significant cases and bin separately
-  corr.out.sig <- corr.out %>% filter(p <= 0.05)
+  corr.out.sig <- corr.out %>% filter(p <= target_alpha)
   if (dim(corr.out.sig)[1] > 0) {
     binned_data_sig <- cut(corr.out.sig$cor, breaks=bins, include.lowest=TRUE)
     table_list_sig[[sig_counter]] <- table(binned_data_sig)
@@ -74,6 +82,17 @@ df2 <- data.frame(
   freq_corr_all = freq_table_all$combined_tbl,
   freq_corr_sig = freq_table_sig$combined_tbl_sig
 )
+
+empirical_alpha <- sum(df2$freq_corr_sig) / sum(df2$freq_corr_all)
+
+p <- ggplot(data = df2, 
+            mapping = aes(x=bin_upper_lim, y=freq_corr_all)) +
+     geom_col(fill="gray80", color="white") +
+     geom_col(aes(y=freq_corr_sig), fill="red2") +
+     theme_bw() +
+     scale_x_continuous(name="Pearson Correlation Coefficient") +
+     scale_y_continuous(name="Frequency")
+
 
 
 
