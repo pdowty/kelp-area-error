@@ -26,6 +26,12 @@ set.seed(42)   # for reproducibility
 sig_counter <- 1
 for (i in seq(1,nreps)) {
 
+  # write occasional update to console
+  if (i %% 50 == 0) {
+    message(sprintf("Working on iteration %d",i))
+  }
+  
+  
   df <- data.frame( 
       e1 = rnorm(nrows),
       e2 = rnorm(nrows),
