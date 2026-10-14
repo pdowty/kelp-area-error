@@ -10,9 +10,11 @@ for (i in seq(1,N)) {
   empirical_alpha_vect[i] <- empirical_alpha
 }
 
-
-p10 <- ggplot(data = empirical_alpha_vect,
-              mapping = aes(x=empirical_alpha_vect),
-              y = 0) +
+df <- data.frame(
+  alpha_empirical = empirical_alpha_vect,
+  y = rep(0, length(empirical_alpha_vect))
+)
+p10 <- ggplot(data = df, 
+              mapping = aes(x=alpha_empirical, y=y)) +
        geom_point() +
        theme_bw()

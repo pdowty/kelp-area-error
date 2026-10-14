@@ -24,7 +24,7 @@ bin_upper_lim <- bins[-1]
 table_list <- list()
 table_list_sig <- list()
 
-set.seed(42)   # for reproducibility
+# set.seed(42)   # for reproducibility
 
 target_alpha <- 0.05
 
