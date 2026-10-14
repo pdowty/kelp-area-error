@@ -39,7 +39,7 @@ corr.out <- corr.out %>%
          !(var1=="e3" & var2=="e2"),
          var1 != "e4")
 
-# graph of specified error "y = " across range of A values
+# graph of specified error (y-axis) across range of A values (x-axis)
 p <- ggplot(data = df,
             mapping = aes(x=A, y=e1)) +
      geom_point(size=0.5, stroke=0, fill="gray30", alpha=0.2) +
