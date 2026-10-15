@@ -3,18 +3,24 @@
 
 N <- 10  # number of times to source and get value of empirical alpha
 
-empirical_alpha_vect <- numeric()
+empirical_alpha_vect <- numeric(N)
 
-for (i in seq(1,N)) {
+for (j in seq(1,N)) {
   source("code/test_rate_sig_corr_no_A_dep.r")
-  empirical_alpha_vect[i] <- empirical_alpha
+  empirical_alpha_vect[j] <- empirical_alpha
+  cat(sprintf("j=%d   length=%d\n",j,length(empirical_alpha_vect)))
 }
 
-df <- data.frame(
+dfalpha <- data.frame(
   alpha_empirical = empirical_alpha_vect,
   y = rep(0, length(empirical_alpha_vect))
 )
-p10 <- ggplot(data = df, 
+p10 <- ggplot(data = dfalpha, 
               mapping = aes(x=alpha_empirical, y=y)) +
        geom_point() +
-       theme_bw()
+       theme_bw() +
+       theme(
+         axis.text.y = element_blank(),
+         axis.title.y = element_blank()
+       ) +
+       scale_x_continuous(limits=c(0, 0.1))
