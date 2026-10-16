@@ -11,6 +11,8 @@ library(rstatix)
 
 ##################### set parameters ####################
 
+k <- 0.1  # fraction of kelp Area that is stdev of error distribution
+
 nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
@@ -41,10 +43,10 @@ for (i in seq(1,nreps)) {
   }
   
   df <- data.frame( 
-      e1 = rnorm(nrows),
-      e2 = rnorm(nrows),
-      e3 = rnorm(nrows),
-      e4 = rnorm(nrows)
+      e1 = k*A*rnorm(nrows),
+      e2 = k*A*rnorm(nrows),
+      e3 = k*A*rnorm(nrows),
+      e4 = k*A*rnorm(nrows)
     )
 
   corr.out <- df %>% cor_test(e1, e2, e3, e4)
@@ -85,7 +87,7 @@ df2 <- data.frame(
 
 empirical_alpha <- sum(df2$freq_corr_sig) / sum(df2$freq_corr_all)
 
-p <- ggplot(data = df2, 
+pA <- ggplot(data = df2, 
             mapping = aes(x=bin_upper_lim, y=freq_corr_all)) +
      geom_col(fill="gray80", color="white") +
      geom_col(aes(y=freq_corr_sig), fill="red2") +
