@@ -8,6 +8,10 @@ library(dplyr)
 library(ggplot2)
 library(rstatix)
 
+# get start time
+start_time <- Sys.time()
+
+set.seed(51)
 
 ##################### set parameters ####################
 
@@ -83,6 +87,7 @@ df2 <- data.frame(
   freq_corr_sig = freq_table_sig$combined_tbl_sig
 )
 
+
 empirical_alpha <- sum(df2$freq_corr_sig) / sum(df2$freq_corr_all)
 
 p <- ggplot(data = df2, 
@@ -93,7 +98,10 @@ p <- ggplot(data = df2,
      scale_x_continuous(name="Pearson Correlation Coefficient") +
      scale_y_continuous(name="Frequency")
 
-
+# get end time
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+print(elapsed_time)
 
 
 

@@ -8,10 +8,18 @@ library(dplyr)
 library(ggplot2)
 library(rstatix)
 
+# get start time
+start_time <- Sys.time()
+
+
+set.seed(995)
+
 
 ##################### set parameters ####################
 
 k <- 0.1  # fraction of kelp Area that is stdev of error distribution
+
+A <- 5   #  true kelp area, i.e. 5 ha
 
 nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
@@ -95,7 +103,9 @@ pA <- ggplot(data = df2,
      scale_x_continuous(name="Pearson Correlation Coefficient") +
      scale_y_continuous(name="Frequency")
 
-
-
+# get end time
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+print(elapsed_time)
 
 
