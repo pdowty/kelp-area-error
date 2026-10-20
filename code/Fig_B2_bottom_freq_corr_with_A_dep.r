@@ -17,6 +17,10 @@ set.seed(995)
 
 ##################### set parameters ####################
 
+set.seed(184)
+
+A <- 5  # true kelp area (hectares)
+
 k <- 0.1  # fraction of kelp Area that is stdev of error distribution
 
 A <- 5   #  true kelp area, i.e. 5 ha
@@ -27,14 +31,13 @@ nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring dat
 nreps <- 2000 
 
 # set bins of correlation for graphing
-bins <- seq(-0.8,0.8, by=0.05)
+bins <- seq(-0.8,0.8, by=0.025)
 bin_upper_lim <- bins[-1]
 
 # create empty lists to contain frequencies from each iteration
 table_list <- list()
 table_list_sig <- list()
 
-# set.seed(42)   # for reproducibility
 
 target_alpha <- 0.05
 
@@ -100,8 +103,13 @@ pA <- ggplot(data = df2,
      geom_col(fill="gray80", color="white") +
      geom_col(aes(y=freq_corr_sig), fill="red2") +
      theme_bw() +
+     theme(
+      axis.text = element_text(size=10),
+      axis.title.x = element_text(size=14, margin=margin(t=10)),
+      axis.title.y = element_text(size=14, margin=margin(r=10))
+     ) +
      scale_x_continuous(name="Pearson Correlation Coefficient") +
-     scale_y_continuous(name="Frequency")
+     scale_y_continuous(name="Frequency", limits=c(0,600))
 
 # get end time
 end_time <- Sys.time()

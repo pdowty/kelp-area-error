@@ -1,5 +1,5 @@
 ###############################################################################
-#  Demo 1 in Appendix B3
+#  Demo in Appendix B3 - as of 10/20/2026 this is unused within draft report
 #
 #  This function takes a value of k and a data frame with variable A.
 #  A=kelp area values; k = constant to relate area to stdev of source errors:

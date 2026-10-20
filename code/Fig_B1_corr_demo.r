@@ -6,6 +6,8 @@
 # Variables are named to follow  y = x1 + x2 where all are random variables.
 # Variable z is a precursor random variable used to create x2.
 #
+# The graphs produced are the pieces assembled for Figure B-1 of the report.
+#
 # September 2026
 ###############################################################################
 

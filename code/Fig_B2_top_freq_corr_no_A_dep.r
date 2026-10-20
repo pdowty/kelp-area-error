@@ -1,6 +1,8 @@
 ###############################################################################
 # Test rate of sig. correlation with four independently generated random vars
 #
+# Creates Fig. B2 (top panel) in draft report. 
+#
 # October 2026
 ###############################################################################
 
@@ -15,13 +17,15 @@ set.seed(51)
 
 ##################### set parameters ####################
 
+set.seed(27)
+
 nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
 nreps <- 2000 
 
 # set bins of correlation for graphing
-bins <- seq(-0.8,0.8, by=0.05)
+bins <- seq(-0.8,0.8, by=0.025)
 bin_upper_lim <- bins[-1]
 
 # create empty lists to contain frequencies from each iteration
@@ -95,8 +99,13 @@ p <- ggplot(data = df2,
      geom_col(fill="gray80", color="white") +
      geom_col(aes(y=freq_corr_sig), fill="red2") +
      theme_bw() +
+     theme(
+      axis.text = element_text(size=10),
+      axis.title.x = element_text(size=14, margin=margin(t=10)),
+      axis.title.y = element_text(size=14, margin=margin(r=10))
+     ) +
      scale_x_continuous(name="Pearson Correlation Coefficient") +
-     scale_y_continuous(name="Frequency")
+     scale_y_continuous(name="Frequency", limits=c(0,600))
 
 # get end time
 end_time <- Sys.time()
