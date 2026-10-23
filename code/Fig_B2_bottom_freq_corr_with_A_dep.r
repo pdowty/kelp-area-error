@@ -12,8 +12,6 @@ library(rstatix)
 start_time <- Sys.time()
 
 
-set.seed(995)
-
 
 ##################### set parameters ####################
 
@@ -25,13 +23,13 @@ k <- 0.1  # fraction of kelp Area that is stdev of error distribution
 
 A <- 5   #  true kelp area, i.e. 5 ha
 
-nrows <- 20    #  length of simulated data record, e.g. 20 yrs of monitoring data
+nrows <- 100    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
-nreps <- 2000 
+nreps <- 1000 
 
 # set bins of correlation for graphing
-bins <- seq(-0.8,0.8, by=0.025)
+bins <- seq(-0.6,0.6, by=0.025)
 bin_upper_lim <- bins[-1]
 
 # create empty lists to contain frequencies from each iteration
