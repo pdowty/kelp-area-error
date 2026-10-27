@@ -1,8 +1,6 @@
 ###############################################################################
 # Test rate of sig. correlation with four independently generated random vars
 #
-# Creates Fig. B2 (top panel) in draft report. 
-#
 # October 2026
 ###############################################################################
 
@@ -14,14 +12,21 @@ library(rstatix)
 start_time <- Sys.time()
 
 
+
 ##################### set parameters ####################
 
-set.seed(27)
+set.seed(184)
+
+A <- 5  # true kelp area (hectares)
+
+k <- 0.1  # fraction of kelp Area that is stdev of error distribution
+
+A <- 5   #  true kelp area, i.e. 5 ha
 
 nrows <- 100    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
-nreps <- 1000 
+nreps <- 2000 
 
 # set bins of correlation for graphing
 bins <- seq(-0.4,0.4, by=0.020)
@@ -31,7 +36,6 @@ bin_upper_lim <- bins[-1]
 table_list <- list()
 table_list_sig <- list()
 
-# set.seed(42)   # for reproducibility
 
 target_alpha <- 0.05
 
@@ -48,10 +52,10 @@ for (i in seq(1,nreps)) {
   }
   
   df <- data.frame( 
-      e1 = rnorm(nrows),
-      e2 = rnorm(nrows),
-      e3 = rnorm(nrows),
-      e4 = rnorm(nrows)
+      e1 = k*A*rnorm(nrows),
+      e2 = k*A*rnorm(nrows),
+      e3 = k*A*rnorm(nrows),
+      e4 = k*A*rnorm(nrows)
     )
 
   corr.out <- df %>% cor_test(e1, e2, e3, e4)
@@ -90,12 +94,11 @@ df2 <- data.frame(
   freq_corr_sig = freq_table_sig$combined_tbl_sig
 )
 
-
 empirical_alpha <- sum(df2$freq_corr_sig) / sum(df2$freq_corr_all)
 
-p <- ggplot(data = df2, 
+pA <- ggplot(data = df2, 
             mapping = aes(x=bin_upper_lim, y=freq_corr_all)) +
-     geom_col(fill="gray80", color="white") +
+     geom_col(fill="gray65", color="white") +
      geom_col(aes(y=freq_corr_sig), fill="red2") +
      theme_bw() +
      theme(
@@ -104,12 +107,11 @@ p <- ggplot(data = df2,
       axis.title.y = element_text(size=14, margin=margin(r=10))
      ) +
      scale_x_continuous(name="Pearson Correlation Coefficient") +
-     scale_y_continuous(name="Frequency", limits=c(0,500))
+     scale_y_continuous(name="Frequency", limits=c(0,1000))
 
 # get end time
 end_time <- Sys.time()
 elapsed_time <- end_time - start_time
 print(elapsed_time)
-
 
 

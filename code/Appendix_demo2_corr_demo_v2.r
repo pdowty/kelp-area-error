@@ -99,11 +99,13 @@ for (icol in seq(2,ncols)) {
   colname <- str_c("sum_",names(data3)[icol])
   data3[[colname]] <- data3[,1] + data3[,icol]
 }
-var_diff_df <- data.frame(col_vars <- sapply(data3, var))
+var_diff_df <- data.frame(col_vars = sapply(data3, var))
+var_rho0 <- var_diff_df$col_vars[12]
+std_rho0 <- sqrt(var_rho0)
 var_diff_df <- var_diff_df %>%
-  mutate(var_diff_PC = (col_vars - col_vars[8])/col_vars[8],
+  mutate(var_diff_PC = (col_vars - var_rho0)/var_rho0,
          col_stdev = sqrt(col_vars),
-         sd_diff_PC = (col_stdev - col_stdev[8])/col_stdev[9])
+         sd_diff_PC = (col_stdev - std_rho0)/std_rho0)
 
 cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 
@@ -164,7 +166,7 @@ for (icorr in corr_target_vals) {
     scale_y_continuous(limits=c(0,900), name="frequency")
   
   filename <- str_c("output_graphs/demo2_x1x2_",sprintf("%.1f", icorr),".png")
-  ggsave(file=filename, width=3.5, height=2, units="in")
+#  ggsave(file=filename, width=3.5, height=2, units="in")
 }
 
 ###############################################################################
@@ -196,7 +198,7 @@ pscatter <- ggplot(scatt_df, mapping=aes(x=x1, y=x2)) +
     strip.text = element_blank()
   )
 filename2 <- "output_graphs/demo2_scatter_facets.png"
-ggsave(file=filename2, width=3, height=6, units="in")
+# ggsave(file=filename2, width=3, height=6, units="in")
   
 
 
@@ -219,7 +221,7 @@ sum_histos <- ggplot(data = scatt_df,
     scale_y_continuous(limits=c(0,900), name="frequency")
   
   filename3 <- "output_graphs/demo2_sum_histos.png"
-  ggsave(file=filename3, width=3.5, height=6, units="in")
+  # ggsave(file=filename3, width=3.5, height=6, units="in")
 
 
 
