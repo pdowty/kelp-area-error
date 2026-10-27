@@ -8,6 +8,9 @@
 #
 # The graphs produced are the pieces assembled for Figure B-1 of the report.
 #
+# This code version does same simulations as v1 but creates a different set
+# of graphs for report.
+#
 # September 2026
 ###############################################################################
 
@@ -30,7 +33,7 @@ x2_mean <- 12
 x2_stdev <- 3
 
 # correlation values to create range of covariance between x1 and x2 
-corr_target_vals <- c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+corr_target_vals <- c(-0.8, -0.4, -0.2, 0.0, 0.2, 0.4, 0.8)
 
 
 
@@ -84,7 +87,7 @@ names(data3) <- df_names
 ###############################################################################
 #  get x1-x2 correlations
 ###############################################################################
-corr_vals <- cor(data3[,1], data3[,2:7], use = "pairwise.complete.obs")
+corr_vals <- cor(data3[,1], data3[,2:ncols], use = "pairwise.complete.obs")
 
 
 
@@ -107,7 +110,8 @@ cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
 
 
 ###############################################################################
-#  graph panels - x1-x2 xy scatter plot, freq. histograms of x1, x2, x1+x2 
+#  graph stacked freq. histograms for x1 and x2 and write to png file. 
+#  Makes separate set of histograms for each correlation level.
 ###############################################################################
 # make tidy
 data_tidy <- data3 |>
@@ -125,22 +129,27 @@ data_tidy <- data3 |>
                                     levels = c("sum","x1","x2"))
          )
 
-# loop through correlation levels
+# loop through correlation levels to plot x1-x2 freq histograms
 for (icorr in corr_target_vals) {
   # filter for records with icorr correlation or 9999 which are x1 records
   data_filt <- data_tidy |> filter(target_correlation == icorr |
                                    target_correlation == 9999.0)
   
-  # make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
+  #### p3 - make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
   label_var_data <- data.frame(
-    data_category_fct = factor(c("sum","x1","x2"), levels = c("sum","x1","x2")),
+    data_category_fct = factor(c("x1","x2"), levels = c("x1","x2")),
     x = 40,
     y = 730,
-    label = c("X1+X2","X1","X2")
+    label = c("X1","X2")
   )
   
-  p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category_fct)) +
-    geom_histogram(bins=100, color="white", linewidth=0.2) +
+  # stacked freq. histograms of X1 and X2
+  data_filt_x1x2 <- data_filt %>% 
+      filter(data_category_fct != "sum") %>%
+      mutate(data_category_fct = factor(data_category_fct, levels=c("x1","x2")))
+  p3 <- ggplot(data = data_filt_x1x2, 
+               mapping = aes(x=value)) + 
+    geom_histogram(bins=100, color="white", fill="gray50", linewidth=0.1) +
     facet_wrap(vars(data_category_fct), ncol=1) +
     geom_text(data=label_var_data, mapping=aes(x=x, y=y, label=label),
               hjust=1, vjust=1, inherit.aes=FALSE, size=8, size.unit="pt") +
@@ -152,34 +161,65 @@ for (icorr in corr_target_vals) {
       strip.text = element_blank()
     ) +
     scale_x_continuous(limits=c(0,40)) +
-    scale_y_continuous(limits=c(0,900))
+    scale_y_continuous(limits=c(0,900), name="frequency")
   
-  filename <- str_c("output_graphs/demo2_",sprintf("%.1f", icorr),".png")
-  ggsave(file=filename, width=2.5, height=2, units="in")
-  
-  # make x1-x2 scatter plot
-  data_filt_wide <- data_filt %>%
-     filter(data_category_fct != "sum") %>%
-     select(-target_correlation, -data_category, -variable) %>%
-     group_by(data_category_fct) %>%
-     mutate(obsID = row_number()) %>%
-     ungroup() %>%
-     pivot_wider(id_cols=obsID, names_from=data_category_fct, values_from=value)
-  pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
-    geom_point(size=0.5, alpha=0.2, stroke=0, fill="gray30") +
-    theme_bw() +
-    theme(
-      axis.text = element_text(size=6),
-      axis.title = element_text(size=8),
-      strip.text = element_blank()
-    )
-  filename2 <- str_c("output_graphs/demo2_scatter_",sprintf("%.1f", icorr),".png")
-  ggsave(file=filename2, width=1.5, height=1.5, units="in")
-  
+  filename <- str_c("output_graphs/demo2_x1x2_",sprintf("%.1f", icorr),".png")
+  ggsave(file=filename, width=3.5, height=2, units="in")
 }
 
+###############################################################################
+# create x1-x2 scatter plots faceted by correlation level
+###############################################################################
+scatt_df <- data.frame(target_corr = numeric(),
+                       x1 = numeric(),
+                       x2 = numeric(),
+                       sum = numeric())
+# create graphing df by looping through corr values
+for (i in seq(1,length(corr_target_vals))) {
+ x2col <- i + 1
+ sumcol <- i + 1 + 7
+ irows <- data.frame(target_corr = rep(corr_target_vals[i],times=N),
+                     x1 = data3$x1,
+                     x2 = data3[,x2col],
+                     sum = data3[,sumcol]) 
+ scatt_df <- rbind(scatt_df, irows)
+}
+
+  
+pscatter <- ggplot(scatt_df, mapping=aes(x=x1, y=x2)) +
+  geom_point(size=0.5, alpha=0.2, stroke=0, fill="gray30") +
+  facet_wrap(vars(target_corr), ncol=2) +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size=6),
+    axis.title = element_text(size=8),
+    strip.text = element_blank()
+  )
+filename2 <- "output_graphs/demo2_scatter_facets.png"
+ggsave(file=filename2, width=3, height=6, units="in")
+  
 
 
+###############################################################################
+# create stacked freq. histograms of X1+X2 with facets by correlation 
+###############################################################################
+sum_histos <- ggplot(data = scatt_df, 
+                     mapping = aes(x=sum)) +  
+    geom_histogram(bins=100, color="white", fill="gray50", linewidth=0.1) +
+    facet_wrap(vars(target_corr), ncol=1) +
+    theme_bw() +
+    theme(
+      legend.position = "none",
+      axis.text = element_text(size=6),
+      axis.title.x = element_text(size=8, margin=margin(t=10)),
+      axis.title.y = element_text(size=8, margin=margin(r=10)),
+      strip.text = element_blank()
+    ) +
+    scale_x_continuous(limits=c(0,40), name="X1 + X2") +
+    scale_y_continuous(limits=c(0,900), name="frequency")
+  
+  filename3 <- "output_graphs/demo2_sum_histos.png"
+  ggsave(file=filename3, width=3.5, height=6, units="in")
 
 
 

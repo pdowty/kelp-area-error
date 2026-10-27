@@ -1,0 +1,190 @@
+###############################################################################
+# Demo 2 showing how the variance of the sum of two random variables
+# responds to covariance between the two random variables. This is 
+# demonstrated with simulated data.
+#
+# Variables are named to follow  y = x1 + x2 where all are random variables.
+# Variable z is a precursor random variable used to create x2.
+#
+# The graphs produced are the pieces assembled for Figure B-1 of the report.
+#
+# September 2026
+###############################################################################
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+
+
+###############################################################################
+# set parameters
+###############################################################################
+N <- 10000    # size of x1 and x2 simulated vectors 
+
+# parameters for normal distributions for freq. distributions of x1 and x2
+x1_mean <- 10 
+x1_stdev <- 2
+
+x2_mean <- 12
+x2_stdev <- 3
+
+# correlation values to create range of covariance between x1 and x2 
+corr_target_vals <- c(-0.8, -0.4, -0.2, 0.0, 0.2, 0.4, 0.8)
+
+
+
+###############################################################################
+#  create data frame with N rows and n columns (n=length(corr_target_vals) +1)
+#  with structure:
+#    col 1: values of random variable x1 
+#    col 2: random variates x2 with corr_vals[1] correlation with x2
+#    col 3: random variates x2 with corr_vals[2] correlation with x2
+#    col 4: random variates x2 with corr_vals[3] correlation with x2
+#    .....
+#    col n: random variates x2 with corr_vals[n] correlation with x2
+###############################################################################
+
+# first make data frame of same dimensions [N, n] with columns of independent
+# standard normal random variates. Col 1 is std normal version of x1.
+# Cols 2:n are all instances of z, the precursor to x2, which is also 
+# standard normal.
+nrows <- N
+ncols <- length(corr_target_vals) + 1
+data1 <- as.data.frame(matrix(rnorm(nrows*ncols), nrow=nrows, ncol=ncols))
+
+# Transform the z columns to standard normal versions of x2 with specified
+# correlation with x1
+data2 <- data1
+for (icol in seq(2,ncols)) {
+ target_corr <- corr_target_vals[icol - 1]
+ data2[,icol] <- data2[,1]*target_corr + sqrt(1 - target_corr^2) * data2[,icol]
+}
+
+# Scale col 1 using x1 parameters, cols 2:n using x2 parameters
+data3 <- data2 
+data3[,1] <- x1_mean + data2[,1]*x1_stdev
+for (icol in seq(2,ncols)) {
+  data3[,icol] <- x2_mean + data2[,icol] * x2_stdev
+}
+
+# create meaningful column names
+df_names <- character(ncols)
+df_names[1] <- "x1"
+for (icol in seq(2,ncols)) {
+ icorr <- corr_target_vals[icol - 1]
+ corr_str <- sprintf("%.1f", icorr)
+ suffix <- str_remove(corr_str, "\\.")
+ x2name <- str_c("x2", suffix, sep="_")
+ df_names[icol] <- x2name 
+}
+names(data3) <- df_names  
+
+
+###############################################################################
+#  get x1-x2 correlations
+###############################################################################
+corr_vals <- cor(data3[,1], data3[,2:ncols], use = "pairwise.complete.obs")
+
+
+
+###############################################################################
+# calc x1+x2 sums, population variances, covariances
+# covariance(x,y) = correlation(x,y) / (stdev(x) * stdev(y))
+###############################################################################
+for (icol in seq(2,ncols)) {
+  colname <- str_c("sum_",names(data3)[icol])
+  data3[[colname]] <- data3[,1] + data3[,icol]
+}
+var_diff_df <- data.frame(col_vars <- sapply(data3, var))
+var_diff_df <- var_diff_df %>%
+  mutate(var_diff_PC = (col_vars - col_vars[8])/col_vars[8],
+         col_stdev = sqrt(col_vars),
+         sd_diff_PC = (col_stdev - col_stdev[8])/col_stdev[9])
+
+cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
+
+
+
+###############################################################################
+#  graph panels - x1-x2 xy scatter plot, freq. histograms of x1, x2, x1+x2 
+###############################################################################
+# make tidy
+data_tidy <- data3 |>
+  pivot_longer(cols=everything(), cols_vary="slowest", names_to="variable",
+               values_to="value") |>
+  mutate(target_correlation = ifelse(str_detect(variable, "_"),
+                                     as.numeric(str_extract(variable,"[^_]+$"))/10,
+                                     9999),
+         data_category = case_when(
+           str_detect(variable,"x1") ~ "x1",
+           str_detect(variable,"sum") ~ "sum",
+           str_detect(variable,"x2") ~ "x2"
+         ),
+         data_category_fct = factor(data_category,
+                                    levels = c("sum","x1","x2"))
+         )
+
+# loop through correlation levels
+for (icorr in corr_target_vals) {
+  # filter for records with icorr correlation or 9999 which are x1 records
+  data_filt <- data_tidy |> filter(target_correlation == icorr |
+                                   target_correlation == 9999.0)
+  
+  #### p3 - make 3 stacked graph panels for freq. histograms of x1, x2, x1+x2
+  label_var_data <- data.frame(
+    data_category_fct = factor(c("sum","x1","x2"), levels = c("sum","x1","x2")),
+    x = 40,
+    y = 730,
+    label = c("X1+X2","X1","X2")
+  )
+  
+  p3 <- ggplot(data = data_filt, mapping = aes(x=value, fill=data_category_fct)) +
+    geom_histogram(bins=100, color="white", linewidth=0.2) +
+    facet_wrap(vars(data_category_fct), ncol=1) +
+    geom_text(data=label_var_data, mapping=aes(x=x, y=y, label=label),
+              hjust=1, vjust=1, inherit.aes=FALSE, size=8, size.unit="pt") +
+    theme_bw() +
+    theme(
+      legend.position = "none",
+      axis.text = element_text(size=6),
+      axis.title = element_text(size=8),
+      strip.text = element_blank()
+    ) +
+    scale_x_continuous(limits=c(0,40)) +
+    scale_y_continuous(limits=c(0,900))
+  
+  filename <- str_c("output_graphs/demo2_",sprintf("%.1f", icorr),".png")
+  ggsave(file=filename, width=2.5, height=2, units="in")
+  
+  ##### pscatter - make x1-x2 scatter plot
+  data_filt_wide <- data_filt %>%
+     filter(data_category_fct != "sum") %>%
+     select(-target_correlation, -data_category, -variable) %>%
+     group_by(data_category_fct) %>%
+     mutate(obsID = row_number()) %>%
+     ungroup() %>%
+     pivot_wider(id_cols=obsID, names_from=data_category_fct, values_from=value)
+  pscatter <- ggplot(data_filt_wide, mapping=aes(x=x1, y=x2)) +
+    geom_point(size=0.5, alpha=0.2, stroke=0, fill="gray30") +
+    theme_bw() +
+    theme(
+      axis.text = element_text(size=6),
+      axis.title = element_text(size=8),
+      strip.text = element_blank()
+    )
+  filename2 <- str_c("output_graphs/demo2_scatter_",sprintf("%.1f", icorr),".png")
+  ggsave(file=filename2, width=1.5, height=1.5, units="in")
+  
+}
+
+
+
+
+
+
+
+
+
+
+
