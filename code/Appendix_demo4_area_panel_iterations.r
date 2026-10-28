@@ -17,10 +17,11 @@
 ###############################################################################
 
 library(tibble)
-
+library(dplyr)
 
 run_iterations <- function(k,rho,A,Niter) {
   
+  # generate normal random variates that will become the four error terms
   iter_df <- as.data.frame(
     matrix(rnorm(4*Niter), ncol=4, nrow=Niter)
   )  
@@ -57,15 +58,7 @@ run_iterations <- function(k,rho,A,Niter) {
     var_Ahat = var(iter_df$Ahat)
   )
   
-    
-    
-    
-    
-    
-  
-  
-  
-  
+  return(resultsObj) 
   
 }   # end function definition
 
