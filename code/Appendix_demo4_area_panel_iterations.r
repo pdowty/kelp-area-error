@@ -12,26 +12,29 @@
 #  - 6 pairwise correlations among the error terms
 #  - variance of Ahat
 #
+# Function mvrnorm from the MASS package is used to generate correlated 
+# error terms.
+#
 # October 2026
 #
 ###############################################################################
 
 library(tibble)
-library(dplyr)
+library(MASS)
 
 run_iterations <- function(k,rho,A,Niter) {
   
-  # generate normal random variates that will become the four error terms
-  iter_df <- as.data.frame(
-    matrix(rnorm(4*Niter), ncol=4, nrow=Niter)
-  )  
-  names(iter_df) <- c("zX1","z02","z03","z04")
+  set.seed(73)
   
-  # calc correlated z values for the four error terms
-  iter_df <- iter_df %>% 
-    mutate(zX2 = rho * zX1 + sqrt(1.0 - rho*rho) * z02,
-           zX3 = rho * zX1 + sqrt(1.0 - rho*rho) * z03,
-           zX4 = rho * zX1 + sqrt(1.0 - rho*rho) * z04)
+  # create pairwise correlation matrix for the 4 error sources
+  cor_matrix <- matrix(rho, nrow=4, ncol=4)
+  diag(cor_matrix) <= 1
+  
+  # use cor_matrix to generate standard normal random variates for the four
+  # error sources 
+  sim_data <- mvrnorm(n=Niter, mu=rep(0,4), Sigma=cor_matrix)
+  iter_df <- as.data.frame(sim_data)
+  names(iter_df) <- c("zX1","zX2","zX3","zX4")
   
   # all 4 error terms share same stdev
   error_stdev <- k*A
