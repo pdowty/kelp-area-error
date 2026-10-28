@@ -20,16 +20,24 @@
 ###############################################################################
 
 library(tibble)
+library(dplyr)
 library(MASS)
 
 run_iterations <- function(k,rho,A,Niter) {
   
   set.seed(73)
-  
+
+   
   # create pairwise correlation matrix for the 4 error sources
   cor_matrix <- matrix(rho, nrow=4, ncol=4)
-  diag(cor_matrix) <= 1
+  diag(cor_matrix) <- 1
   
+  # test eigen values of correlation matrix to ensure will work with mvrnorm
+  eigen_vals <- eigen(cor_matrix)$values
+  if (any(eigen_vals < 0)) {
+    print("negative eigen value")
+  }
+   
   # use cor_matrix to generate standard normal random variates for the four
   # error sources 
   sim_data <- mvrnorm(n=Niter, mu=rep(0,4), Sigma=cor_matrix)
