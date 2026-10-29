@@ -32,7 +32,8 @@ x1_stdev <- 2
 x2_mean <- 12
 x2_stdev <- 3
 
-# correlation values to create range of covariance between x1 and x2 
+# correlation values to create range of covariance between x1 and x2 i
+# if this vector is changed, may need to change def below of var_rho0
 corr_target_vals <- c(-0.8, -0.4, -0.2, 0.0, 0.2, 0.4, 0.8)
 
 
@@ -107,7 +108,8 @@ var_diff_df <- var_diff_df %>%
          col_stdev = sqrt(col_vars),
          sd_diff_PC = (col_stdev - std_rho0)/std_rho0)
 
-cov_vals <- corr_vals * sqrt(col_vars[2:ncols] * col_vars[1])
+cov_vals <- corr_vals * sqrt(var_diff_df$col_vars[2:ncols] * 
+                               var_diff_df$col_vars[1])
 
 
 
@@ -187,10 +189,14 @@ for (i in seq(1,length(corr_target_vals))) {
  scatt_df <- rbind(scatt_df, irows)
 }
 
+# for better ordering of panels
+scatt_df <- scatt_df %>%
+  mutate(target_corr_fct = factor(target_corr, levels = c(-0.8,0.8,-0.4,0.4,
+                                                          -0.2, 0.2,0)))
   
 pscatter <- ggplot(scatt_df, mapping=aes(x=x1, y=x2)) +
   geom_point(size=0.5, alpha=0.2, stroke=0, fill="gray30") +
-  facet_wrap(vars(target_corr), ncol=2) +
+  facet_wrap(vars(target_corr_fct), ncol=2) +
   theme_bw() +
   theme(
     axis.text = element_text(size=6),
@@ -198,7 +204,7 @@ pscatter <- ggplot(scatt_df, mapping=aes(x=x1, y=x2)) +
     strip.text = element_blank()
   )
 filename2 <- "output_graphs/demo2_scatter_facets.png"
-# ggsave(file=filename2, width=3, height=6, units="in")
+ggsave(file=filename2, width=3, height=6, units="in")
   
 
 

@@ -76,7 +76,7 @@ for (ik in k) {
 rho0_results <- results %>% 
   filter(rho_target == 0.0)  %>%
   mutate(rho0_var_Ahat = var_Ahat) %>%
-  select(k,A,rho0_var_Ahat)
+  dplyr::select(k,A,rho0_var_Ahat)
 results_jn <- results %>% left_join(rho0_results, by=join_by(k,A))
 results_final <- results_jn %>%
   mutate(delta_stdev_Ahat = (sqrt(var_Ahat) - sqrt(rho0_var_Ahat))/
@@ -84,7 +84,7 @@ results_final <- results_jn %>%
          
 
 ###############################################################################
-#  Create panel figure 
+#  Create panel figures
 ###############################################################################
 pFig <- ggplot(data=results_final,
                mapping = aes(x=A, y=delta_stdev_Ahat)) +
@@ -100,9 +100,13 @@ results_final_Afilt <- results_final %>%
                                     levels=c(-0.3,-0.2,-0.1,0,0.1,0.2,0.3)),
             k_fct = factor(k,levels=c(0.1, 0.2, 0.3)))
 pFig2 <- ggplot(data=results_final_Afilt,
-                mapping=aes(x=rho_target_fct, delta_stdev_Ahat, fill=k_fct)) +
+                mapping=aes(x=rho_target_fct, y=delta_stdev_Ahat, fill=k_fct)) +
          geom_col(position="dodge", color="black", width=0.7) +
          theme_bw()
+pFig2b <- ggplot(data=results_final_Afilt,
+                 mapping=aes(x=rho_target_fct, y=var_Ahat, fill=k_fct)) +
+          geom_col(position="dodge", color="gray20", width=0.7) +
+          theme_bw()
                   
 
 
