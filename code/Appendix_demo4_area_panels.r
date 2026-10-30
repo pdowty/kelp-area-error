@@ -103,6 +103,7 @@ pFig2 <- ggplot(data=results_final_Afilt,
                 mapping=aes(x=rho_target_fct, y=delta_stdev_Ahat, fill=k_fct)) +
          geom_col(position="dodge", color="black", width=0.7) +
          theme_bw()
+#         axis.text = element_text(size=8)
 pFig2b <- ggplot(data=results_final_Afilt,
                  mapping=aes(x=rho_target_fct, y=var_Ahat, fill=k_fct)) +
           geom_col(position="dodge", color="gray20", width=0.7) +
