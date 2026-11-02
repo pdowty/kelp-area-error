@@ -25,7 +25,7 @@ corr_matrix[1,2] <- hi_corr_value
 corr_scenarios[[1]] <- corr_matrix
 
 # test eigen values of correlation matrix to ensure will work with mvrnorm
-eigen_vals <- eigen(cor_matrix)$values
+eigen_vals <- eigen(corr_matrix)$values
 if (any(eigen_vals < 0)) {
   print("negative eigen value")
 }
