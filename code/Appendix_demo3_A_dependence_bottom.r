@@ -21,8 +21,6 @@ A <- 5  # true kelp area (hectares)
 
 k <- 0.1  # fraction of kelp Area that is stdev of error distribution
 
-A <- 5   #  true kelp area, i.e. 5 ha
-
 nrows <- 100    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
