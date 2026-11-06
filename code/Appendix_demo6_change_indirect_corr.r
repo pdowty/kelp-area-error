@@ -7,7 +7,8 @@
 #
 ###############################################################################
 
-
+library(tidyr)
+library(ggplot2)
 
 
 ##################### set parameters ####################
@@ -45,18 +46,37 @@ for (iA2 in seq_along(A2)) {
   
   results_rec <- data.frame(
    A1 = A1,
-   A2 = iA2,
+   A2 = A2[iA2],
    rho_e1_pair = cor(idf$A1_e1, idf$A2_e1),
    rho_e2_pair = cor(idf$A1_e2, idf$A2_e2),
    rho_e3_pair = cor(idf$A1_e3, idf$A2_e3),
    rho_e4_pair = cor(idf$A1_e4, idf$A2_e4)
   )  
 
+  results_df <- rbind(results_df, results_rec)
+  
 }  # end for loop through A2 values  
 
 
 ## create graph 1: x:error pair  y=corr  grouping=deltaA_percent  
-  
+results_df <- results_df %>%
+  mutate(rel_delta_A = (A2 - A1)/A1) %>%
+  pivot_longer(cols=starts_with("rho"),
+               names_to="error_pair",
+               values_to="correlation") %>%
+  mutate(rel_delta_A_fct = factor(rel_delta_A, levels=c(-0.7,-0.6,-0.5,-0.4,-0.3,
+                                                 -0.2,-0.1)))
+
+
+p1 <- ggplot(data = results_df,
+             mapping = aes(x=error_pair,
+                           y=correlation,
+                           fill=rel_delta_A_fct,
+                           color=rel_delta_A_fct, 
+                           group=rel_delta_A_fct)) +
+      geom_point() +
+      geom_line() +
+      theme_bw()
 
 
 
