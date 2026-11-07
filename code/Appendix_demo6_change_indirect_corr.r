@@ -8,6 +8,7 @@
 ###############################################################################
 
 library(tidyr)
+library(dplyr)
 library(ggplot2)
 
 
@@ -76,7 +77,16 @@ p1 <- ggplot(data = results_df,
                            group=rel_delta_A_fct)) +
       geom_point() +
       geom_line() +
-      theme_bw()
+      theme_bw() +
+      theme(
+        axis.title.x = element_text(margin=margin(t=10)),
+        axis.title.y = element_text(margin=margin(r=15))
+      ) +
+      scale_x_discrete(name="Error Term Pair",
+                       labels=c("e1 pair","e2 pair","e3 pair","e4 pair")) +
+      scale_y_continuous(name="Correlation", limits=c(-0.1,0.1)) +
+      scale_color_discrete(name="True Prop. Kelp Area Change") +
+      scale_fill_discrete(name="True Prop. Kelp Area Change")
 
 
 
