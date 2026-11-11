@@ -18,13 +18,13 @@ start_time <- Sys.time()
 
 set.seed(27)
 
-nrows <- 100    #  length of simulated data record, e.g. 20 yrs of monitoring data
+nrows <- 1000    #  length of simulated data record, e.g. 20 yrs of monitoring data
 
 # number of iterations to run, with 4 simulations nested within each iteration
 nreps <- 2000 
 
 # set bins of correlation for graphing
-bins <- seq(-0.4,0.4, by=0.020)
+bins <- seq(-0.15,0.15, by=0.005)
 bin_upper_lim <- bins[-1]
 
 # create empty lists to contain frequencies from each iteration
@@ -104,7 +104,7 @@ p <- ggplot(data = df2,
       axis.title.y = element_text(size=14, margin=margin(r=10))
      ) +
      scale_x_continuous(name="Pearson Correlation Coefficient") +
-     scale_y_continuous(name="Frequency", limits=c(0,1000))
+     scale_y_continuous(name="Frequency", limits=c(0,900))
 
 # get end time
 end_time <- Sys.time()

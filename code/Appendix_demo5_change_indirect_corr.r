@@ -1,8 +1,9 @@
 ###############################################################################
-# Appendix demo 6
+# Appendix demo 5
 #
-# For kelp area chnage show if there is indirect correlation due to joint
-# dependence on Area
+# For kelp area change show if there is indirect correlation due to joint
+# dependence on Area when all errors have same centered Gaussian error 
+# distributions.
 #
 #
 ###############################################################################
