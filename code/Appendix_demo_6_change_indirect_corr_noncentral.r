@@ -21,7 +21,7 @@ library(ggplot2)
 get_neg_z <- function(n) {
   x <- rnorm(2.1*n)
   neg_x <- x[x<=0][1:n]
-  if (length(neg_x) < n) {
+  if (anyNA(neg_x)) {
     print("error with neg z")
   } 
   return(neg_x) 
@@ -42,7 +42,7 @@ nrows <- 10000   # number of simulated surveys
 
 # initialize results data frame
 results_df <- data.frame(
-  A1 = numeric(), A2 = numeric() 
+  A2o = numeric(), A1est = numeric(), A2est = numeric(), deltaAEst = numeric() 
 )  
 
 
@@ -50,23 +50,23 @@ results_df <- data.frame(
 for (iA2 in seq_along(A2)) {
 
   # generate A1 and A2 error terms; e1,e2,e3 are truncated normal; e4 is normal 
-  idf <- data.frame( 
-      A1_e1 = k*A1*get_neg_z(nrows),
-      A1_e2 = k*A1*get_neg_z(nrows),
-      A1_e3 = k*A1*get_neg_z(nrows),
-      A1_e4 = k*A1*rnorm(nrows),
-      A2_e1 = k*A2[iA2]*get_neg_z(nrows),
-      A2_e2 = k*A2[iA2]*get_neg_z(nrows),
-      A2_e3 = k*A2[iA2]*get_neg_z(nrows),
-      A2_e4 = k*A2[iA2]*rnorm(nrows)
-  )
+  A1_e1 <- k*A1*get_neg_z(nrows)
+  A1_e2 <- k*A1*get_neg_z(nrows)
+  A1_e3 <- k*A1*get_neg_z(nrows)
+  A1_e4 <- k*A1*rnorm(nrows)
+  A2_e1 <- k*A2[iA2]*get_neg_z(nrows)
+  A2_e2 <- k*A2[iA2]*get_neg_z(nrows)
+  A2_e3 <- k*A2[iA2]*get_neg_z(nrows)
+  A2_e4 <- k*A2[iA2]*rnorm(nrows)
   
   results_rec <- data.frame(
-   A1 = A1,
-   A2 = A2[iA2],
+   A2o = A2[iA2],
+   A1est = A1 + A1_e1 + A1_e2 + A1_e3 + A1_e4,
+   A2est = A2[iA2] + A2_e1 + A2_e2 + A2_e3 + A2_e4
   )
+  results_rec <- results_rec %>%
+    mutate(deltaAEst = A2est - A1est)
   results_df <- rbind(results_df, results_rec)
-
 }
 
 
