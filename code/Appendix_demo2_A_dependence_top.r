@@ -23,6 +23,9 @@ nrows <- 1000    #  length of simulated data record, e.g. 20 yrs of monitoring d
 # number of iterations to run, with 4 simulations nested within each iteration
 nreps <- 2000 
 
+k <- 0.1
+
+
 # set bins of correlation for graphing
 bins <- seq(-0.15,0.15, by=0.005)
 bin_upper_lim <- bins[-1]
@@ -48,10 +51,10 @@ for (i in seq(1,nreps)) {
   }
   
   df <- data.frame( 
-      e1 = rnorm(nrows),
-      e2 = rnorm(nrows),
-      e3 = rnorm(nrows),
-      e4 = rnorm(nrows)
+      e1 = k*rnorm(nrows),
+      e2 = k*rnorm(nrows),
+      e3 = k*rnorm(nrows),
+      e4 = k*rnorm(nrows)
     )
 
   corr.out <- df %>% cor_test(e1, e2, e3, e4)
