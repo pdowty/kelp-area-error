@@ -23,13 +23,13 @@ A2 <- c(9,8,7,6,5,4,3)
 k <- 0.1  # fraction of kelp Area that is stdev of error distribution
 
 # number of simulated surveys for each A2 scenario that are used to calculate
-# correlation.
+# correlation coefficient.
 nObs <- 5000 
 
 # number of iterations where each iteration gives a correlation value
 nIterations <- 10000
 
-# initialize results data frame
+# initialize results data frame - to hold nrows = nIterations x length(A2)
 results_df <- data.frame(
   A1 = numeric(), A2 = numeric(), corr_A1est_A2est = numeric() 
 )  
@@ -38,25 +38,31 @@ results_df <- data.frame(
 ##########  loop through A2 values. For each value simulate values ########## 
 for (iA2 in seq_along(A2)) {
   
+  # loop through the iterations - each iteration produces a correlation value
+  for (iter in seq(1,nIterations)) {
 
-  # generate A1 error terms  
-  A1_e1 = k*A1*rnorm(nrows)
-  A1_e2 = k*A1*rnorm(nrows)
-  A1_e3 = k*A1*rnorm(nrows)
-  A1_e4 = k*A1*rnorm(nrows)
-  A2_e1 = k*A2[iA2]*rnorm(nrows)
-  A2_e2 = k*A2[iA2]*rnorm(nrows)
-  A2_e3 = k*A2[iA2]*rnorm(nrows)
-  A2_e4 = k*A2[iA2]*rnorm(nrows)
+    # generate nObs instances of the A1 error terms as rows in one data frame
+    iter_df <- data.frame (
+      A1_e1 = k*A1*rnorm(nObs)
+      A1_e2 = k*A1*rnorm(nObs)
+      A1_e3 = k*A1*rnorm(nObs)
+      A1_e4 = k*A1*rnorm(nObs)
+      A2_e1 = k*A2[iA2]*rnorm(nObs)
+      A2_e2 = k*A2[iA2]*rnorm(nObs)
+      A2_e3 = k*A2[iA2]*rnorm(nObs)
+      A2_e4 = k*A2[iA2]*rnorm(nObs)
+    )
   
-  results_rec <- data.frame(
-   A1 = A1,
-   A2 = A2[iA2],
-   A1est = A1 + A1_e1 + A1_e2 + A1_e3 + A1_e4i,
-   A2est = A2 + A2_e1 + A2_e2 + A2_e3 + A2_e4
-  )  
-  results_df <- rbind(results_df, results_rec)
-  
+    iter_df <- iter_df %>%
+      mutate(A1 = rep(A1, times=nObs),
+             A2 = rep(A2[iA2], times=nObs),
+             A1est = A1 + A1_e1 + A1_e2 + A1_e3 + A1_e4i,
+             A2est = A2 + A2_e1 + A2_e2 + A2_e3 + A2_e4
+      )
+    
+    
+    results_df <- rbind(results_df, results_rec)
+  }  # end for loop through iterations 
 }  # end for loop through A2 values  
 
 
