@@ -1,12 +1,12 @@
 ###############################################################################
-# Appendix demo 6 - modified code for testing only - not to be used in report 
+# Appendix demo 6 - modified code for testing only - not intended for report 
 #
 # When the demo 6 results did not show any correlation between A1hat & A2hat,
 # and some correlation was expected, this code was modified so that the same
 # random variates used to generate error terms were used for both A1hat and
 # A2hat.  This is not a useful model for the goals of this work, but is intended
 # to create a condition where correlations should be present to ensure the math
-# is working as intended.
+# is working as intended and apparent in the graphing.
 #
 # For kelp area change show if there is indirect correlation due to joint
 # dependence on Area when each of the four error terms have their own
@@ -43,7 +43,7 @@ get_neg_z <- function(n) {
 
 ##################### set parameters ####################
 
-set.seed(64)
+set.seed(44)
 
 A1 <- 10  # true initial kelp area (hectares)
 A2 <- c(9,8,7,6,5,4,3)
@@ -135,8 +135,8 @@ p <- ggplot(hist_df) +
       ymax = ymax
     ),
     fill = "coral",
-    color = "white",
-    linewidth = 0.3
+    color = "coral",
+    linewidth = 0.05
   ) +
   theme_bw() +
   theme(
