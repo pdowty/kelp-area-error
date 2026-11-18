@@ -81,7 +81,7 @@ for (iA2 in seq_along(A2)) {
     centered_z_variates <- rnorm(nObs) 
     iter_df <- data.frame (
       A1 = rep(A1, times=nObs),
-      A2 = rep(A2, times=nObs),
+      A2 = rep(A2[iA2], times=nObs),
       A1_e1 <- k*A1*neg_z_variates,
       A1_e2 <- k*A1*neg_z_variates,
       A1_e3 <- k*A1*neg_z_variates,
