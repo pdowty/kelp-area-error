@@ -127,14 +127,6 @@ pVarA1hat <- ggplot(data=results_final,
           )
 pVarA2hat <- ggplot(data=results_final,
               mapping=aes(x=rho_target_fct, y=var_A2hat, fill=k_fct)) +
-pVarA1hat <- ggplot(data=results_final,
-              mapping=aes(x=rho_target_fct, y=var_A1hat, fill=k_fct)) +
-          geom_col(position="dodge", color="gray20", width=0.7) +
-          facet_grid(cols=vars(A2_fct)) +
-          theme_bw() +
-          theme(
-            axis.text = element_text(size=10)
-          )
           geom_col(position="dodge", color="gray20", width=0.7) +
           facet_grid(cols=vars(A2_fct)) +
           theme_bw() +
