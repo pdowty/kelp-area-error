@@ -10,6 +10,7 @@
 ###############################################################################
 
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 
 set.seed(93)
@@ -104,7 +105,8 @@ results_final <- results_jn %>%
          
 
 ###############################################################################
-#  Create panel figures
+#  Create panel figures row by row; rows are different variables; cols are
+#  correlations values shared by all pairwise error terms with in year.
 ###############################################################################
 
 pCorr <- ggplot(data=results_final,
@@ -153,6 +155,51 @@ pDeltaStdev <- ggplot(data=results_final,
                )
 
                   
+###############################################################################
+#  Create the figures above but as a single object using variable option in
+#  facet_grid.
+###############################################################################
+# first prepare data - select needed cols and make tidy (longer)
+results_tidy <- results_final %>%
+  dplyr::select(k_fct, rho_target_fct, A1, A2_fct, corr_A1A2, var_A1hat, 
+                var_A2hat, var_deltaA, delta_stdev_deltaAhat) %>%
+  pivot_longer(
+    cols=c("corr_A1A2","var_A1hat","var_A2hat","var_deltaA","delta_stdev_deltaAhat"),
+    names_to="y_variable",
+    values_to="y_value"
+  ) %>%
+  mutate(
+    y_variable_fct = factor(y_variable, 
+                            levels=c("corr_A1A2","var_A1hat","var_A2hat",
+                                     "var_deltaA","delta_stdev_deltaAhat"))
+  )
+
+# labelling for facet rows and columns
+A2_names <- c("2" = "A2 = 2 ha", 
+              "5" = "A2 = 5 ha",
+              "8" = "A2 = 8 ha",
+              "10" = "A2 = 10 ha")
+y_var_names <- c("corr_A1A2" = "Correlation A1-A2",
+                 "var_A1hat" = "Var (A1 est)",
+                 "var_A2hat" = "Var (A2 est)",
+                 "var_deltaA" = "Var (delta-A)",
+                 "delta_stdev_deltaAhat" = "delta-stdev-deltaAhat")
+
+p_all <- ggplot(data=results_tidy,
+                mapping=aes(x=rho_target_fct, y=y_value, fill=k_fct)) +
+         geom_col(position="dodge", color="gray20", width=0.7) +
+         facet_grid(cols=vars(A2_fct), 
+                    rows=vars(y_variable_fct),
+                    scales="free_y",
+                    switch="y", 
+                    labeller=labeller(A2_fct=A2_names, y_variable_fct=y_var_names)) +
+         theme_bw() +
+         theme(
+           strip.placement="outside",
+           strip.background.y=element_blank(),
+           axis.title.y=element_blank(),
+           axis.text = element_text(size=9)
+         )
 
 
 
