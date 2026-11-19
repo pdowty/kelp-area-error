@@ -17,7 +17,7 @@ library(ggplot2)
 start_time <- Sys.time()
 cat("\nStarting....\n")
 
-source("code/Appendix_demo4_area_panel_iterations.r")
+source("code/Appendix_demo3_area_panel_iterations.r")
 
 
 ###############################################################################
@@ -51,6 +51,7 @@ for (ik in k) {
     cat(sprintf("ik=%f  irho=%f\n",ik,irho))
     
     for (iA in Avals) {
+      
       iter_Obj <- run_iterations(ik, irho, iA, N)
       results_rec <- data.frame(
         k = ik,
